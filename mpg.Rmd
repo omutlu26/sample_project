@@ -11,8 +11,6 @@ output:
     toc_depth: '3'
     number_section: yes
 ---
-\newpage
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -165,9 +163,6 @@ Tüm sayısal değişkenlerin ortalama ve medyanını bulmak için
 ozet=mpg%>%summarise_if(is.numeric,list(ort=mean, medyan=median))
 knitr::kable(ozet)
 ```
-
-
-
 
 ## Grafiklerin Çizilmesi
 
