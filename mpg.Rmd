@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-Bu doküman istatistik dersinde öğrencilerin yapacakları projelerde yardımcı olmak için hazırlanmıştır. faaliyetler hazırlaması konusunda nlerin 
+Bu doküman istatistik dersinde öğrencilerin yapacakları projelerde yardımcı olmak için hazırlanmıştır. 
 
 
 # Projenin Konusu ve Amacı
@@ -36,13 +36,11 @@ library(tidyverse)
 
 İstatisitksel analizler için toplanan veriler genellikle  direkt olarak kullanıma hazır değildir.  Toplanma şeklinden veya bilgisayara aktarılmasından kaynaklı olarak veriler içinde pek çok sorun bulunabilir. Bu nedenle analizlere başlamadan önce veri içindeki sorunlar giderilerek verilerin temiz hale getirilmesi gerekir. 
 
-İstatisitksel analizlerin ilk aşaması 
+Önce mpg veri setini aktif hale getirelim 
 
 ```{r}
 data(mpg)
 ```
-
-### Verilerin Yazdırılması
 
 Veri setinde yer alan değişkenleri ve bu değişkenlere ait ilk 6 gözlemi tablo olarak yazdıralım.
 
@@ -50,7 +48,7 @@ Veri setinde yer alan değişkenleri ve bu değişkenlere ait ilk 6 gözlemi tab
 knitr:: kable(head(mpg, 6))
 ```
 
-Yukarıdaki tablodaki değişkenlerin açıklamaları aşağıdaki gibidir
+Tablodaki değişkenlerin açıklamaları aşağıdaki gibidir
 
 * **manufacturer:** Üretici 
 * **model:** Aracın modeli
