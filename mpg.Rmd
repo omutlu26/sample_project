@@ -1,0 +1,185 @@
+---
+title: "Örnek Proje"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    number_section: yes
+    highlight: tango
+  word_document:
+    toc: yes
+    toc_depth: '3'
+    number_section: yes
+---
+\newpage
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Projenin Konusu ve Amacı
+
+istatistik dersinde öğrencilerin proje hazırlaması konusunda nlerin farklı araç tiplerinin yakıt tüketimleri ilgili istatistiksel analizler yapılacaktır. 
+
+Bu amaçla hazır veri setlerinden **mpg** veri seti kullanılmıştır. Bu veri seti 1999-2008 yılları arasında üretilen otomobillerin yakıt ekonomisi ile ilgili verileri içermektedir. 
+
+
+## Projede Kullanılan Paketler
+
+Projede verilerin düzenlenmesi, grafiklerin çizilmesi ve istatisiksel analizlerin yapılması için aşağıda belirtilen paketler kullanılmıştır.
+
+```{r, warning=FALSE,message=FALSE}
+library(tidyverse)
+```
+
+
+## Verilerin Temizlenmesi
+
+İstatisitksel analizler için toplanan veriler genellikle  direkt olarak kullanıma hazır değildir.  Toplanma şeklinden veya bilgisayara aktarılmasından kaynaklı olarak veriler içinde pek çok sorun bulunabilir. Bu nedenle analizlere başlamadan önce veri içindeki sorunlar giderilerek verilerin temiz hale getirilmesi gerekir. 
+
+İstatisitksel analizlerin ilk aşaması 
+
+```{r}
+data(mpg)
+```
+
+### Verilerin Yazdırılması
+
+Veri setinde yer alan değişkenleri ve bu değişkenlere ait ilk 6 gözlemi tablo olarak yazdıralım.
+
+```{r}
+knitr:: kable(head(mpg, 6))
+```
+
+Yukarıdaki tablodaki değişkenlerin açıklamaları aşağıdaki gibidir
+
+* **manufacturer:** Üretici 
+* **model:** Aracın modeli
+* **displ:** Motor hacmi
+* **year:** Üretim yılı
+* **cyl:** silindir sayısı
+* **trans:** Vites tipi (manuel veya otomatik)
+* **drv:** Çekiş tipi (önden çekişli, arkadan çekişli veya 4x4)
+* **cty:** Şehir içi yakıt tüketimi
+* **hwy:** Şehir dışı yakıt tüketimi
+* **fl:** Yakıt tipi (e: etonol, p:premum yakıt, d: dizel, c: CNC, r=normal (regular))
+* **class:** Sınıf
+
+### Değişken Tiplerinin Değiştirilmesi
+
+Veri setindeki değişken tiplerinin istatistiksel analizler yapmak veya grafikler çizmek için uygun hale getirilmesi gereklidir. Bunun için, önce veri setindeki değişkenlerin tiplerini belirleyelim.
+
+```{r}
+str(mpg)
+```
+
+`chr` tipinde olan değişkenleri `factor` tipine dönüştürmek grafiklerin çizilmesinde ve analizlerde kolaylık sağlamaktadır. Karekter tipindeki `trans` değişkenini faktör tipine dönüştürmek için aşağıdaki komutu kullanabiliriz
+
+
+```{r}
+mpg$trans<-as.factor(mpg$trans)
+```
+Tüm karakter tipindeki değişkenlerin hepsini fakör tipine dönüştürmek için dplyr paketi içinde yer alan `mutate_if()` fonksiyonunu kullanabiliriz
+
+```{r}
+
+mpg <- mpg %>%
+  mutate_if(sapply(mpg, is.character), as.factor)
+```
+
+Veri setinde yıl gibi bazı değişkenler tamsayı değeri almasına rağmen bu değişkenler üzerinde sayısal işlemler genellikle yapılmaz. Bu değişkenler de aslında kategorik değişkenlerdir. Bu değişkenlerde faktör formatına dönüştürülebilir. Bu veri setinde `year`, `cyl` sayısal olarak belirtilemesine rağmen aslında kategorik değişkenlerdir. Bu nedenle bu değişkenleri de faktör tipine dönüştürebiliriz. 
+
+```{r}
+mpg$year<-as.factor(mpg$year)
+veri$cyl<-as.factor(veri$cyl)
+str(veri)
+```
+
+### Gözlemlerin Düzenlenmesi ve Yeni Değişken Ekleme
+
+Veri setlerinde özellikle kategorik değişkenlera ait gözlemler bilgisayara girilmesi sırasında hatalar yapılabilmektedir.  Örneğin cinsiyet olarak tanımlanan bir değişkendeki gözlemler "Erkek", "E","Bay" olarak üç farklı şekilde girmiş veya "Erkk" ve "By" gibi yazım hatası yapmış olabilir. Sayısal değişkenler ait gözlemlerde zaman zaman fazla ve eksik basamak girişleri yapılabilmektedir. 
+
+Örneğin vites tipi olarak  manuel ve otomatik olmak üzere iki ana kategori bulunmakla beraber Mpg veri setinde,`trans` değişkeni altında araç modellerine göre alt kategorilerin de girildiği görülmektedir. Eğer alt tipler üzerinde bir çalışma yapılması istenmiyor ise gözlemleri otomatik ve manuel olmak üzere iki grup altında toplanabilir. mak için aşağıdaki komutu kullanabiliriz.  
+
+```{r}
+mpg$trans <- as.factor(ifelse(substring(mpg$trans, 1, 1) == "a", "automatic", "manual"))
+```
+
+
+```{r}
+mpg<-mpg%>%mutate(mmpg=0.7*cty+0.3*hwy)
+knitr:: kable(head(mpg, 6))
+```
+
+### Eksik Gözlemlerin Silinmesi
+
+Veri setindeki bazı değişkenlere ait gözlemler eksik ise bu durumda iki yöntem kullanılabilir. Birincisi eksik verilerin bulunduğu tüm satırlar veri setinden çıkartılabilir. Bu yöntem eksik gözlemler çıktığında elde kalan veriler analizler için yeterli ise tercih edilebilir. İkinci yöntemde eksik veriler bir tahmin yönetemi kullanılarak tahmin edilebilir. Örneğin sayısal değişkenler için artimaktik ortalama veya medyan değerleri tahmin olarak kullanılabilir. Kategorik değişkenler için ise en sık tekrar eden değer tahmin olarak kullanılabilir. Bunların dışında daha karmaşık yöntemler de kullanılabilir. Eğer veri seti dataframe formatında ise bu veri seti içinde eksik veri olup olmadığını kontrol etmek için dblyr paketi içindeki `summarise_all()` fonksiyonu ve gözlem sayısını bulan `n()` fonksiyonunu kullanabiliriz. Aşağıdaki komutta `na.rm=TRUE` argümanı eksik verilerin çıkarılmasını sağlamaktadır.
+
+```{r}
+mpg%>%summarise_all(list(~n()),na.rm=TRUE)
+```
+
+Yukarıdaki tabloda tüm değişkenler 234 adet gözleme sahip olduğundan bu veri setinde eksik gözlem bulunmamaktadır. 
+
+Bir veri setinde yer alan tüm eksik verileri silmek için R'deki `na.omit()` fonksiyonu kullanılabilir.
+
+```{r}
+mpg<-mpg%>%na.omit()
+```
+
+Tüm eksik verileri silmek çok sayıda veri kaybına neden olduğu için tercih edilmemelidir. Bunun yerine sadece analizlerde kullanılan değişkenlerdeki eksik verilerin silinmesi daha uygun bir yaklaşım olur.  Bir veya daha fazla sütunlardaki eksik verileri silmek için dblyr paketi içinde yer alan  `filter()` veya `drop_na()` fonksiyonları kullanılabilir. Örneğin `cyl` ve `hwy` değişkenleri içindeki eksik gözlemleri silmek için aşağıdaki komutları kullanabiliriz. Aşağıdaki komutta `is.na()` fonksiyonu eğer gözlem eksik ise `TRUE` değilse `FALSE` değerini vermektedir. `!` mantıksal operatörü  işlemi  tersine çevirmektedir. 
+
+```{r eval=FALSE}
+mpg%>%filter(!is.na(cyl)&!is.na(hwy))
+mpg%>%drop_na(cyl,hwy)
+```
+
+### Gözlemlerin Dağılımındaki Dengesizlikleri Tespit Etmek
+
+
+Kategorik değişkenler üzerinde yapılan analizlerde her alt kategori için yeterli sayıda ve mümkünse eşit sayıda gözlem olması analizlerin daha doğru olması için oldukça önemlidir. Kategorik değişkelerin her alt kategoride kaçar tane gözlem olduğunu görmek için R'deki `summary()` fonksiyonunu kullanabiliriz. Aşağıdaki komutta `sellect_if()` fonksiyonu dplyr paketi içinde yer alan bir fonksiyondur. 
+
+```{r}
+summary(mpg%>%select_if(is.factor))
+```
+
+Yukarıdaki sonuçlar incelendiğinde bazı kategorik değişkenler içinde bulunan alt kotegorilerdeki gözlemlerin dağılımlarının dengeli olmadığı görülmektedir. Örneğin `cyl`, `drv` ve `fl` kategorik değişkenleri alt kategorilere göre dengeli bir dağılıma sahip değildir. 
+
+Sütün bazında gözlemlerin dağılımını görmek için dplyr içindeki `group_by()` ve `summarise()` fonksiyonlarını kullanabiliriz. Örneğin, silindir sayılarına göre gözlemlerin dağılımını görmek için
+
+```{r}
+mpg%>%group_by(cyl)%>% summarise(count=n(), na.rm=TRUE)
+```
+
+## İstatistiklerin Hesaplanması
+
+Veri seti hakkında genel bilgiler elde etmek için veri setindeki değişkenlere ait istatistikler hesaplanmalıdır. Sayısal değişkenler için genellikle ortalama, medyan, standart sapma, minimum ve maksimum gibi istatistikler hesaplanırken sözel değişkenler için oranlar en çok tekrar eden değerler belirlenebilir. R'deki `summary()` fonksiyonu özellikle sayısal değişkenler için bazı istatistiklerin hesaplanması için kullanabiliriz 
+
+```{r cars}
+summary(mpg)
+summary(mpg%>%select_if(is.numeric))
+```
+
+Tüm sayısal değişkenlerin ortalama ve medyanını bulmak için
+
+```{r}
+ozet=mpg%>%summarise_if(is.numeric,list(ort=mean, medyan=median))
+knitr::kable(ozet)
+```
+
+
+
+
+## Grafiklerin Çizilmesi
+
+```{r}
+ggplot(mpg)+
+  aes(x=cyl, y=mmpg)+
+  geom_boxplot(aes(colour=trans))+
+  labs(x="Silindir Sayısı", y="Yakıt Tüketimi (mpg)", colour = "Vites Türü",
+       title = "Silindir sayı ve Vites tipine göre Ortalama Yakıt Tüketimleri", )
+ggplot(mpg, aes(x=displ, y=hwy))+
+  geom_point(aes(shape=cyl, colour=trans, size=year), size=3)+
+  labs(x="Silindir Hacmi (Litre)", y="Mesafe (mil)",shape="Silindir sayısı", colour="Vites Tipi")+
+  theme_dark()
+```
+
