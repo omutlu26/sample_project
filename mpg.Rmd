@@ -14,11 +14,15 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+Bu doküman istatistik dersinde öğrencilerin yapacakları projelerde  faaliyetler hazırlaması konusunda nlerin farklı araç tiplerinin yakıt tüketimleri ilgili istatistiksel analizler yapılacaktır.
+Bu amaçla hazır veri setlerinden **mpg** veri seti kullanılmıştır. Bu veri seti 1999-2008 yılları arasında üretilen otomobillerin yakıt ekonomisi ile ilgili verileri içermektedir.
+
 # Projenin Konusu ve Amacı
 
-istatistik dersinde öğrencilerin proje hazırlaması konusunda nlerin farklı araç tiplerinin yakıt tüketimleri ilgili istatistiksel analizler yapılacaktır. 
 
-Bu amaçla hazır veri setlerinden **mpg** veri seti kullanılmıştır. Bu veri seti 1999-2008 yılları arasında üretilen otomobillerin yakıt ekonomisi ile ilgili verileri içermektedir. 
+
+ 
 
 
 ## Projede Kullanılan Paketler
