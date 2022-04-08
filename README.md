@@ -1,1 +1,1 @@
-İstatistik projelerinin hazırlanmasında öğrencilere yardımcı olmak için hazırlanan bir dökümandır. Güncellemeleri takip ediniz. Düzeltme önerileriniz bildirebilirsiniz.
+İstatistik projelerinin hazırlanmasında öğrencilere yardımcı olmak için hazırlanan bir dökümandır. Güncellemeleri takip ediniz. Düzeltme önerilerinizi bildirebilirsiniz.
