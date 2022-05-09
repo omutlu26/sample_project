@@ -11,8 +11,9 @@ output:
     toc_depth: '3'
     number_section: yes
 ---
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(kableExtra)
 ```
 
 
@@ -21,160 +22,312 @@ Bu doküman istatistik dersinde öğrencilerin yapacakları projelerde yardımc�
 
 # Projenin Konusu ve Amacı
 
-Bu projede farklı araç tiplerinin yakıt tüketimleri ilgili istatistiksel analizler yapılacaktır. Bu amaçla hazır veri setlerinden **mpg** veri seti kullanılmıştır. Bu veri seti 1999-2008 yılları arasında üretilen otomobillerin yakıt ekonomisi ile ilgili verileri içermektedir.
-
-## Projede Kullanılan Paketler
-
-Projede verilerin düzenlenmesi, grafiklerin çizilmesi ve istatisiksel analizlerin yapılması için aşağıda belirtilen paketler kullanılmıştır.
+Bu projede farklı araç tiplerinin yakıt tüketimleri ile ilgili istatistiksel analizler yapılacaktır. Bu amaçla, `tidyverse` paketi içinde yer alan `mpg` veri seti kullanılacaktır. Bu veri seti 1999-2008 yılları arasında üretilen otomobillerin yakıt ekonomisi ile ilgili verileri içermektedir. Bu veri setini kullanabilmek için tidyverse paketinin aktif `library()` fonksiyonu ile aktif hale getirilmesi gereklidir. 
 
 ```{r, warning=FALSE,message=FALSE}
 library(tidyverse)
 ```
 
+İlk olarak `head()` fonksiyonu ile bu veri setindeki  ilk 6 gözleme ulaşarak bu gözlemleri tablo formatında yazdıralım. Tablo oluşturmak için `knitr` paketi içindeki `kable()` fonksiyonununu kullanabiliriz.  ile değişkenleri ve bu değişkenlerdeki gözlemleri tablo formatında yazdırabiliriz. Bu tabloya `caption` seçeneği ile bir açıklama yazısıda ekleyebiliriz. 
 
-## Verilerin Temizlenmesi
-
-İstatisitksel analizler için toplanan veriler genellikle  direkt olarak kullanıma hazır değildir.  Toplanma şeklinden veya bilgisayara aktarılmasından kaynaklı olarak veriler içinde pek çok sorun bulunabilir. Bu nedenle analizlere başlamadan önce veri içindeki sorunlar giderilerek verilerin temiz hale getirilmesi gerekir. 
-
-Önce mpg veri setini aktif hale getirelim 
-
-```{r}
-data(mpg)
-```
-
-Veri setinde yer alan değişkenleri ve bu değişkenlere ait ilk 6 gözlemi tablo olarak yazdıralım.
-
-```{r}
-knitr:: kable(head(mpg, 6))
+```{r, mpgdata, warning=FALSE}
+head(mpg)%>% 
+    knitr:: kable(caption = "mpg veri seti")%>%
+    kableExtra::kable_classic(full_width=FALSE)
 ```
 
 Tablodaki değişkenlerin açıklamaları aşağıdaki gibidir
 
-* **manufacturer:** Üretici 
-* **model:** Aracın modeli
-* **displ:** Motor hacmi
-* **year:** Üretim yılı
-* **cyl:** silindir sayısı
-* **trans:** Vites tipi (manuel veya otomatik)
-* **drv:** Çekiş tipi (önden çekişli, arkadan çekişli veya 4x4)
-* **cty:** Şehir içi yakıt tüketimi
-* **hwy:** Şehir dışı yakıt tüketimi
-* **fl:** Yakıt tipi (e: etonol, p:premum yakıt, d: dizel, c: CNC, r=normal (regular))
-* **class:** Sınıf
+* `manufacturer:` Üretici 
+* `model:` Aracın modeli
+* `displ:` Motor hacmi
+* `year:` Üretim yılı
+* `cyl:` silindir sayısı
+* `trans:` Vites tipi (manuel veya otomatik)
+* `drv:` Çekiş tipi (önden çekişli, arkadan çekişli veya 4x4)
+* `cty:` Şehir içi yakıt tüketimi
+* `hwy:` Şehir dışı yakıt tüketimi
+* `fl:` Yakıt tipi (e: etonol, p:premum yakıt, d: dizel, c: CNC, r=normal (regular))
+* `class:` Sınıf
+
+## Verilerin Temizlenmesi
+
+İstatisitksel analizler için toplanan veriler çoğu zaman doğrudan kullanıma hazır değildir. Verilerin toplanması veya bilgisayara aktarılması sırasında yazım hataları, eksik gözlemler, analizlerde kullanılmayacak değişkenlere ait gözlemler bulunabilir. Analizler için gerekli ancak veriler toplanırken dikkate alınmayan değişkenlerinde veri setine eklenmesi gereklidir. Ayrıca, veriler okunurken değişken R tarafından otomatik olarak belirlenen veri tipleri yanlış veya uygun tipte olmayabilir. Bu nedenle analizlere başlamadan önce veri içindeki hataların düzeltilmesi, eksik gözlemlerin silinmesi, fazla değişkenlerin silinmesi, yeni değişkenlerin eklenmesi, değişken tiplerinin uygun hale getirilmesi gibi işlemlerin yapılması gerekmektedir. Bu işlemler veri temizleme olarak isimlendirilir.  
+
 
 ### Değişken Tiplerinin Değiştirilmesi
 
-Veri setindeki değişken tiplerinin istatistiksel analizler yapmak veya grafikler çizmek için uygun hale getirilmesi gereklidir. Bunun için, önce veri setindeki değişkenlerin tiplerini belirleyelim.
+Veri setindeki değişken tiplerinin istatistiksel analizler yapmak veya grafikler çizmek için uygun hale getirilmesi gereklidir. Mevcut veri setindeki değişkenlerin tiplerini `str()` fonksiyonu ile görebiliriz.
 
 ```{r}
 str(mpg)
 ```
-
-`chr` tipinde olan değişkenleri `factor` tipine dönüştürmek grafiklerin çizilmesinde ve analizlerde kolaylık sağlamaktadır. Karekter tipindeki `trans` değişkenini faktör tipine dönüştürmek için aşağıdaki komutu kullanabiliriz
+Yukarıdaki listede mpg veri setinde yer alan değişkenlerin isimleri, tipleri, gözlem sayıları ve birkaç örnek gözlem verilmektedir. R sözel ifadeleri içeren değişkenleri `chr`, tamsayıları içeren değişkenleri `int` ve ondalıklı sayıları içeren değişkenleri ise `num` olarak belirler. `chr` tipinde olan değişkenleri `Factor` tipine dönüştürmek grafiklerin çizilmesinde ve istatisitsel analizlerin yapılmasında kolaylık sağlamaktadır. Bu nedenle `chr` tipindeki değişkenleri `Factor` tipine dönüştürülmesi gerekir. `as.factor()` fonksiyonu ile bir değişkenin tipi `Factor` tipine dönüştürülebilir. Örneğin `trans` değişkenini faktör tipine dönüştürmek için aşağıdaki komutu kullanabiliriz.
 
 
 ```{r}
 mpg$trans<-as.factor(mpg$trans)
 ```
-Tüm karakter tipindeki değişkenlerin hepsini fakör tipine dönüştürmek için dplyr paketi içinde yer alan `mutate_if()` fonksiyonunu kullanabiliriz
+
+Karakter tipindeki değişkenlerin tümünü fakör tipine dönüştürmek için dplyr paketi içindeki `mutate_if()` fonksiyonunu kullanabiliriz.
 
 ```{r}
-
-mpg <- mpg %>%
-  mutate_if(sapply(mpg, is.character), as.factor)
+mpg <- mpg %>% mutate_if(is.character, as.factor)
 ```
 
-Veri setinde yıl gibi bazı değişkenler tamsayı değeri almasına rağmen bu değişkenler üzerinde sayısal işlemler genellikle yapılmaz. Bu değişkenler de aslında kategorik değişkenlerdir. Bu değişkenlerde faktör formatına dönüştürülebilir. Bu veri setinde `year`, `cyl` sayısal olarak belirtilemesine rağmen aslında kategorik değişkenlerdir. Bu nedenle bu değişkenleri de faktör tipine dönüştürebiliriz. 
+Veri setinde bazı değişkenler sayısal değer almasına rağmen bu değişkenler aslında kategorik nitelikte olabilir. Örneğin, mpg veri setinde `year` ve `cyl` değişkenleri araçların üretim yıllarına ve silindir sayılarına göre sınıflandırmak için kullanılan değişkenlerdir. Bu değişkenler üzerinden aritmatik işlemler yapılmayacağından dolayı bu değişkenleri de faktör tipine dönüştürebiliriz.  
 
 ```{r}
 mpg$year<-as.factor(mpg$year)
-veri$cyl<-as.factor(veri$cyl)
-str(veri)
+mpg$cyl<-as.factor(mpg$cyl)
 ```
 
-### Gözlemlerin Düzenlenmesi ve Yeni Değişken Ekleme
-
-Veri setlerinde özellikle kategorik değişkenlera ait gözlemler bilgisayara girilmesi sırasında hatalar yapılabilmektedir.  Örneğin cinsiyet olarak tanımlanan bir değişkendeki gözlemler "Erkek", "E","Bay" olarak üç farklı şekilde girmiş veya "Erkk" ve "By" gibi yazım hatası yapmış olabilir. Sayısal değişkenler ait gözlemlerde zaman zaman fazla ve eksik basamak girişleri yapılabilmektedir. 
-
-Örneğin vites tipi olarak  manuel ve otomatik olmak üzere iki ana kategori bulunmakla beraber Mpg veri setinde,`trans` değişkeni altında araç modellerine göre alt kategorilerin de girildiği görülmektedir. Eğer alt tipler üzerinde bir çalışma yapılması istenmiyor ise gözlemleri otomatik ve manuel olmak üzere iki grup altında toplanabilir. mak için aşağıdaki komutu kullanabiliriz.  
-
+Bu işlemler sonucunda değişken tipleri aşağıdaki gibi düzenlenmiş olur.
 ```{r}
-mpg$trans <- as.factor(ifelse(substring(mpg$trans, 1, 1) == "a", "automatic", "manual"))
+str(mpg)
 ```
 
 
+### Gözlemlerin Düzenlenmesi
+
+Gözlemlerin toplanması veya bilgisayara aktarılması sırasında veri setinde birtakım hatalar oluşabilmektedir.  Özellikle kategorik değişkenlerde yazım hataları ile sık sık karşılaşılmaktadır. Bu hataların tespit edilmesi ve doğru değerleri ile yerleştirilmesi gerekmektedir.
+
+Örneğin `mpg` veri setinde `trans` değişkeni altında vites tiplerinin daha detaylı bir şekilde girildiği görülmektedir. Bu detay bilgiler gerekli değil ise vites tiplerini genel olarak *otomatik* ve *manuel* olmak üzere iki grup altında toplayabiliriz. Bu değişkendeki gözlemler "auto" veya "manual" kelimelerini içermektedir. Bu nedenle ilk harfi "a" olan gözlemleri "auto" diğerlerini ise "manual" olarak değiştirebiliriz. Bu işlemi `ifelse()` ve `substring()`fonksiyonlarını kullanarak yapabiliriz. `ifelse()` fonksiyonu verilen bir koşul doğru ise bir ifadenin değilse diğer ifadenin yapılmasını sağlamaktadır. `substring()` fonksiyonu ise bir metin dizisi içinde ilk ve son değerler arasında yer alan karakter dizisini vermektedir.     
+
 ```{r}
-mpg<-mpg%>%mutate(mmpg=0.7*cty+0.3*hwy)
-knitr:: kable(head(mpg, 6))
+mpg$trans <- ifelse(substring(mpg$trans, first=1, last=1)== "a", "auto", "manual") %>%as.factor()
+```
+
+### Değişkenlerin Silinmesi ve Yeni Değişken Eklenmesi
+
+Bazı veri setlerinde analizlerde kullanılmayacak değişkenler bulunabilir. Bu değişkenleri silinmesi isteniyor ise bunun için farklı yöntemler kullanılabilir. Birinci olarak, silinecek değişkenlere `NULL` ataması yapılabilir.   
+
+```{r eval=FALSE}
+# manufacturer değişkenini silmek için
+mpg$manufacturer <- NULL
+
+# 1. sıradaki değişkeni silmek için
+mpg[1] <- NULL
+
+# 1, 3 ve 4. sıradaki değişkenleri silmek için
+mpg[c(1,3,4)] <- NULL
+
+```
+
+İkinci olarak değişkenin veri setinde yer aldığı sütun numarasının önüne `-` işareti konulabilir.
+
+```{r eval=FALSE}
+# 2. sıradaki değişkeni silmek için
+mpg <- mpg[-2]
+```
+
+Üçüncü olarak, değişkenleri silmek yerine sadece gerekli değişkenler seçilebilir. 
+
+```{r eval=FALSE,warning=FALSE}
+# veri setinde 3., 10. ve 11. sıradaki değişkenler dışında diğer değişkenlerin silmek için 
+mpg <- mpg[c(3,10,11)]
+```
+Değişkenlerin seçimini dplyr paketindeki `select()` fonksiyonu kullanarak yapılabilir. 
+
+```{r eval=FALSE,warning=FALSE}
+# cyl ve drv sütunlarını seçmek için
+mpg<-mpg %>% select(cyl, drv)
+```
+
+Mevcut veri setinde yer almayan fakat analizler için gerekli değişkenlerin hesaplanması ve/veya başka bir veri setinden kopyalanması gerekebilir. Yeni bir değişken için yeni bir sütun  veri seti ismi ile yeni değişkenin ismi arasına $ işareti konularak oluşturulabilir. Örneğin, `mpg` veri setine ortalama yakıt tüketimi için `mean_mpg` isminde yeni bir sütun oluşturmak için `mpg$mean_mpg` kullanılabilir. Ortalama yakıt tüketimi hesaplanırken şehir içi yakıt tüketiminin %70'i ve şehir dışı yakıt tüketimin %30'u alınmaktadır.  
+
+```{r warning=FALSE}
+mpg$mean_mpg <- 0.7*mpg$cty + 0.3*mpg$hwy
+knitr:: kable(head(mpg, 6))%>%
+  kable_classic(full_width=FALSE)
+```
+
+Ortalama yakıt tüketimi için yeni bir sütun eklemek için alternatif olarak `dplyr` paketi içindeki `mutate()` fonksiyonunu kullanabiliriz. 
+
+```{r eval=FALSE,warning=FALSE}
+mpg <- mpg%>%mutate(mean_mpg=0.7*cty+0.3*hwy)
+
 ```
 
 ### Eksik Gözlemlerin Silinmesi
 
-Veri setindeki bazı değişkenlere ait gözlemler eksik ise bu durumda iki yöntem kullanılabilir. Birincisi eksik verilerin bulunduğu tüm satırlar veri setinden çıkartılabilir. Bu yöntem eksik gözlemler çıktığında elde kalan veriler analizler için yeterli ise tercih edilebilir. İkinci yöntemde eksik veriler bir tahmin yönetemi kullanılarak tahmin edilebilir. Örneğin sayısal değişkenler için artimaktik ortalama veya medyan değerleri tahmin olarak kullanılabilir. Kategorik değişkenler için ise en sık tekrar eden değer tahmin olarak kullanılabilir. Bunların dışında daha karmaşık yöntemler de kullanılabilir. Eğer veri seti dataframe formatında ise bu veri seti içinde eksik veri olup olmadığını kontrol etmek için dblyr paketi içindeki `summarise_all()` fonksiyonu ve gözlem sayısını bulan `n()` fonksiyonunu kullanabiliriz. Aşağıdaki komutta `na.rm=TRUE` argümanı eksik verilerin çıkarılmasını sağlamaktadır.
+Veri setlerinde bazı gözlemlere giriş yapılamadığı veya unutulduğu için boş bırakılmış olabilir. R ile veriler okunurken tüm boşluklar eksik gözlem olarak değerlendirilir ve bu gözlemler `NA` şeklinde etiketlendirilir. Eksik gözlemler barındıran veri setlerinde nasıl bir yaklaşım izleneceği  önceden belirlenmelidir. Veri setinin büyüklüğüne ve eksik gözlem saysına bağlı olarak eksik gözlemler tamamen veya  kısmen silinebilir. Eksik gözlemlerin silinmesi zorunlu olmadıkça tercih edilmemelidir. Bunun yerine, analizler sırasında eksik gözlemleri dikkate almamak, veri kaybının önüne geçeceği için tercih edilmelidir. Bu amaçla, pek çok R fonksiyonunda yer alan `na.rm` seçeneği `na.rm=TRUE` şeklinde belirtilir ise eksik gözlemler analiz sırasında çıkarılmaktadır.  Örneğin ortalamaları hesaplamak için kullanılan `mean()` fonksiyonunda `na.rm=TRUE` olarak belirtilir ise eksik gözlemler ortalamaya dahil edilmezler.
 
-```{r}
-mpg%>%summarise_all(list(~n()),na.rm=TRUE)
+```{r eval=FALSE}
+mean(mpg$cyl, na.rm = TRUE)
 ```
 
-Yukarıdaki tabloda tüm değişkenler 234 adet gözleme sahip olduğundan bu veri setinde eksik gözlem bulunmamaktadır. 
+Eksik gözlemleri silmek yerine diğer bir seçenek eksik gözlemlerin alacağı değerleri tahmin etmektir. Özellikle küçük veri setlerinde bu yöntem tercih edilmelidir. Sayısal değişkenlerdeki eksik gözlemleri tahmin etmek için aritmetik ortalama veya medyan gibi basit istatistikler, kategorik değişkenlerde ise mod (en sık tekrar eden değer) kullanılabilir. Bu basit istatistikler yerine daha karmaşık tahmin yöntemleri de kullanılabilir. 
 
-Bir veri setinde yer alan tüm eksik verileri silmek için R'deki `na.omit()` fonksiyonu kullanılabilir.
+Veri setinde veya bir değişkende eksik gözlem olup olmadığını kontrol etmek için  `is.na()` fonksiyonu kullanabiliriz. Bu fonksiyon eksik gözlemler için `TRUE` diğer durumda `FALSE` sonucunu vermektedir.
+
+```{r}
+a=c(1,NA,4)
+is.na(a)
+```
+
+Bir veri setinde kaç tane eksik veri olduğunu bulmak için ise `sum()` fonksiyonunu kullanabiliriz. `sum()` fonksiyonu `TRUE` veya `FALSE` gibi mantıksal değerleri içeren dizilerde `TRUE` sayısını vermektedir.  
+
+```{r}
+sum(is.na(c(1,NA,4)))
+```
+mpg veri setinde eksik gözlem olup olmadığını belirlemek için aşağıdaki komutu kullanabiliriz.
+```{r}
+sum(is.na(mpg))
+```
+Her değişkendeki eksik gözlemleri görmek için aşağıdaki komutu kullanarak eksik olan gözlemlerin sayısını tablo olarak yazdırabiliriz. 
+```{r}
+summary(is.na(mpg))%>%
+  kable()%>%
+  kable_classic()
+```
+
+Bu tabloda tüm değişkenler için **FALSE=234** olduğundan mpg veri setinde eksik gözlem bulunmamaktadır. 
+
+Bir veri setinde yer alan eksik gözlemlerin tümünü silmek için `na.omit()` fonksiyonu kullanılabilir.
 
 ```{r}
 mpg<-mpg%>%na.omit()
 ```
 
-Tüm eksik verileri silmek çok sayıda veri kaybına neden olduğu için tercih edilmemelidir. Bunun yerine sadece analizlerde kullanılan değişkenlerdeki eksik verilerin silinmesi daha uygun bir yaklaşım olur.  Bir veya daha fazla sütunlardaki eksik verileri silmek için dblyr paketi içinde yer alan  `filter()` veya `drop_na()` fonksiyonları kullanılabilir. Örneğin `cyl` ve `hwy` değişkenleri içindeki eksik gözlemleri silmek için aşağıdaki komutları kullanabiliriz. Aşağıdaki komutta `is.na()` fonksiyonu eğer gözlem eksik ise `TRUE` değilse `FALSE` değerini vermektedir. `!` mantıksal operatörü  işlemi  tersine çevirmektedir. 
+Bir veya daha fazla sütunda bulunan eksik verileri silmek için dblyr paketi içinde yer alan  `drop_na()` fonksiyonu kullanılabilir. Örneğin `cyl` ve `hwy` değişkenleri içindeki eksik gözlemleri silmek için aşağıdaki komutu kullanabiliriz.  
 
 ```{r eval=FALSE}
-mpg%>%filter(!is.na(cyl)&!is.na(hwy))
 mpg%>%drop_na(cyl,hwy)
 ```
 
-### Gözlemlerin Dağılımındaki Dengesizlikleri Tespit Etmek
+### Gözlemlerin Dağılımındaki Dengesizliklerin Tespit Edilmesi
 
-
-Kategorik değişkenler üzerinde yapılan analizlerde her alt kategori için yeterli sayıda ve mümkünse eşit sayıda gözlem olması analizlerin daha doğru olması için oldukça önemlidir. Kategorik değişkelerin her alt kategoride kaçar tane gözlem olduğunu görmek için R'deki `summary()` fonksiyonunu kullanabiliriz. Aşağıdaki komutta `sellect_if()` fonksiyonu dplyr paketi içinde yer alan bir fonksiyondur. 
+Kategorik değişkenler üzerinde yapılan analizlerde değişkenlerin sahip olduğu tüm seviyeler için veri setinde yeterli sayıda gözlem olması oldukça önemlidir. Bu nedenle analizlerin başında her seviyedeki gözlemler tespit edilmelidir. Örneğin silindir sayısına göre araçların dağılımını bulalım. Bunun için `sellect()` fonksiyonu ile `cyl` sütununu seçerek dplyr paketi içinde yer alan bir fonksiyondur. 
 
 ```{r}
-summary(mpg%>%select_if(is.factor))
+mpg%>%
+    select(cyl)%>%
+    group_by(cyl)%>%
+    summarise(sayı=n())%>%
+  knitr::kable()%>%
+  kable_classic(full_width=FALSE)
 ```
 
-Yukarıdaki sonuçlar incelendiğinde bazı kategorik değişkenler içinde bulunan alt kotegorilerdeki gözlemlerin dağılımlarının dengeli olmadığı görülmektedir. Örneğin `cyl`, `drv` ve `fl` kategorik değişkenleri alt kategorilere göre dengeli bir dağılıma sahip değildir. 
-
-Sütün bazında gözlemlerin dağılımını görmek için dplyr içindeki `group_by()` ve `summarise()` fonksiyonlarını kullanabiliriz. Örneğin, silindir sayılarına göre gözlemlerin dağılımını görmek için
-
 ```{r}
-mpg%>%group_by(cyl)%>% summarise(count=n(), na.rm=TRUE)
+summary(mpg%>%
+  select_if(is.factor))
+```
+
+Yukarıdaki sonuçlar incelendiğinde bazı kategorik değişkenler içinde bulunan alt kotegorilerdeki gözlemlerin dağılımlarının dengeli olmadığı görülmektedir. Örneğin `cyl`, `drv` ve `fl` kategorik değişkenlerindeki seviyelerde gözlemlerin dengeli bir şekilde dağılmadığı görülmektedir. 
+
+Bir veya daha fazla sütun bazında gözlemlerin dağılımını görmek için dplyr içindeki `group_by()` ve `summarise()` fonksiyonlarını kullanabiliriz. Örneğin, üretici ve model  sayılarına göre gözlemlerin dengeli bir şekilde dağılıp dağılmadığını görmek için aşağıdaki komutu kullanabiliriz.
+
+```{r, warning=FALSE}
+mpg%>%
+  group_by(manufacturer,model)%>% 
+  summarise(Gozlem_sayisi=n())%>%
+  kable(col.names=c("Üretici","Model","Gözlem Sayısı"))%>%
+  kable_classic(full_width=FALSE)
 ```
 
 ## İstatistiklerin Hesaplanması
 
-Veri seti hakkında genel bilgiler elde etmek için veri setindeki değişkenlere ait istatistikler hesaplanmalıdır. Sayısal değişkenler için genellikle ortalama, medyan, standart sapma, minimum ve maksimum gibi istatistikler hesaplanırken sözel değişkenler için oranlar en çok tekrar eden değerler belirlenebilir. R'deki `summary()` fonksiyonu özellikle sayısal değişkenler için bazı istatistiklerin hesaplanması için kullanabiliriz 
-
-```{r cars}
-summary(mpg)
-summary(mpg%>%select_if(is.numeric))
-```
-
-Tüm sayısal değişkenlerin ortalama ve medyanını bulmak için
+Veri setindeki değişkenlerin frekansları, ortalamaları, vb.  istatistikler veri seti hakkında genel bilgiler elde etmek ve gözden kaçan hataları tespit etmek için analizler öncesinde mutlaka hesaplanmalı ve kontrol edilmelidir. Bu amaçla R'deki `summary()` fonksiyonu kullanılabilir. Bu fonksiyon veri setindeki değişkenlerin tipine bağlı olarak özet istatistikleri verir. Sayısal değişkenler ortalama, medyan, 1.çeyrek, 3. çeyrek, minimum ve maksimum değerleri diğer değişken tipleri için ise frekanslar verilir. 
 
 ```{r}
-ozet=mpg%>%summarise_if(is.numeric,list(ort=mean, medyan=median))
-knitr::kable(ozet)
+summary(
+  mpg%>%select_if(is.numeric)
+  )%>%
+  knitr::kable()%>%
+  kable_classic(full_width=FALSE)
 ```
 
-## Grafiklerin Çizilmesi
+Sayısal değişkenlerin sadece ortalama ve medyanını bulmak için aşağıdaki komutu kullanabiliriz.
+
+```{r}
+mpg%>%summarise_if(is.numeric,list(ort=mean, medyan=median))%>%
+  knitr::kable()%>%
+  kable_classic(full_width=FALSE)
+```
+
+## t Testleri
+
+1999 ve 2008 yıllarında üretilen araçların yakıt tüketimlerini karşılaştırmak için her iki yılda üretilen araçların ortalama yakıt tüketimlerini hesaplayalım. Bunun için önce `group_by()` fonksiyonu ile yıl bazında gözlemleri gruplandırıp daha sonra `summarise()` fonksiyonu ile yıl bazında ortalamaları hesaplayabiliriz.
+
+```{r}
+mpg%>%group_by(year)%>%
+  summarise(mean=mean(mean_mpg))%>%
+  knitr::kable(
+    col.names=c("Yıllar", "Ortalama Yakıt Tüketimi"),
+    digits = 3
+    )%>%
+  kable_styling(full_width = FALSE)
+```
+
+Yukarıdaki tablodan da görüldüğü gibi araçların galon başına mil olarak ortalama mesafeleri birbirine çok yakın çıkmıştır. Bu nedenle yakıt tüketimi konusunda yıllar itibariyle çok fazla bir değişim olmamıştır. 
+
+Yıllar itibariyle yakıt tüketimlerindeki değişimi grafik olarak görmek için kutu grafiğini kullanabiliriz.
+
+```{r}
+mpg%>%group_by(year)%>%ggplot()+
+  aes(x=year, y=mean_mpg)+
+  geom_boxplot()+
+  labs(
+    x="Yıllar", 
+    y="Galon Başına Mesafe (mpg)", 
+    title = "Yıllara göre bir galon yakıt ile gidilen mesafeler"
+    )
+```
+
+Yukarıdaki kutu grafiği de bir önceki bulgumuzu desteklemektedir. Ancak 1999 yılında bazı araçların (nokta ile gösterilen değerler) bir galon yakıt ile çok fazla mesafe gittiği görülmektedir.
+
+Ortalamalar ve grafikler her ne kadar yıllar itibariyle araçların yakıt tüketimlerinde bir değişim olmadığı yönünde bir sonuca bizi götürsede kesin kararımızı ancak t testi yaparak verebiliriz. Bunun için "Yıllar itibari ile araçların bir galon yakıt ile gittikleri mesafe aynıdır" iddiasını araştırmamız gerekir. Bu iddia için sıfır ve alternatif hipotezleri aşağıdaki gibi kurabiliriz:
+
+$$H_0: \mu_{1999}=\mu_{2008}\\
+H_1: \mu_{1999} \ne \mu_{2008}$$
+
+Burada $\mu_{1999}$ ve $\mu_{2008}$ araçların bir galon yakıt ile gittikleri ortalama mesafeleri temsil etmektedir. 
+
+Bu hipotezi  `t.test()` fonksiyonunu kullanarak test edebiliriz. Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
+
+
+```{r}
+test=t.test(data=mpg, mean_mpg~year, var.equal=TRUE)
+test
+```
+
+Yukarıdaki sonuçlarda $p_{değeri}=`r format(test$p.value,digit=4)`>0.05$ olduğundan $H_0$ hipotezi reddedilemez. Yıllara göre araçlaların ortalama mesafelerinde bir değişme olmamıştır.
+
+İkinci olarak, otomatik vitesli araçların düz vitesli araçlara göre daha fazla yakıt tükkettiği şeklinde bir görüş vardır. Bu görüşün doğruluğunu araştırmak için otomatik ve düz vitesli araçların ortalama yakıt tüketimlerini hesaplayalım.
+
+```{r}
+mpg%>%group_by(trans)%>%
+  summarise(mean=mean(mean_mpg))%>%
+  knitr::kable(
+    col.names=c("Vites Tipi", "Ortalama Mesafe"),
+    digits = 3
+    )%>%
+  kable_styling(full_width = FALSE)
+```
+
+Tablodan da görüldüğü düz vitesli araçlar galon başına ortalama 3 mil daha fazla yol yapmaktadır.
+
+Vites tipine göre araçların bir galon benzin ile gittikleri mesafeleri kutu grafiği ile gösterebiliriz. Aşağıdaki grafikten görüldüğü gibi düz vitesli araçlar otomatik vitesli araçlara göre daha fazla mesafe kat etmekedirler.
 
 ```{r}
 ggplot(mpg)+
-  aes(x=cyl, y=mmpg)+
-  geom_boxplot(aes(colour=trans))+
-  labs(x="Silindir Sayısı", y="Yakıt Tüketimi (mpg)", colour = "Vites Türü",
-       title = "Silindir sayı ve Vites tipine göre Ortalama Yakıt Tüketimleri", )
-ggplot(mpg, aes(x=displ, y=hwy))+
-  geom_point(aes(shape=cyl, colour=trans, size=year), size=3)+
-  labs(x="Silindir Hacmi (Litre)", y="Mesafe (mil)",shape="Silindir sayısı", colour="Vites Tipi")+
-  theme_dark()
+  aes(x=trans, y=mean_mpg)+
+  geom_boxplot()+
+  labs(
+    x="Vites Tipi", 
+    y="Ortalama Mesafe (mpg)", 
+    title = "Vites tipine göre Ortalama Mesafe"
+    )
 ```
 
+
+Otomatik vitesli araçların düz vitesli araçlara göre ortalama mesafelerin daha kısa olduğu iddiasını doğru olup olmadığını t testi ile belirleyelim. Bunun için hipotezleri aşağıdaki gibi oluşturabiliriz.
+
+$$H_0: \mu_{auto}=\mu_{manual}\\
+H_1: \mu_{auto}<\mu_{manual}$$
+```{r}
+test2=t.test(data=mpg, mean_mpg~trans, var.equal=TRUE)
+test2
+```
+Yukarıdaki sonuçlarda $p_{değeri}=`r format(test2$p.value,digit=4)`<0.05$ olduğundan $H_0$ hipotezi reddedilir. Otomatik vitesli araçlar bir galon benzinle ortalama olarak daha kısa mesafe kattemektedirler.
