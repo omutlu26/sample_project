@@ -38,7 +38,7 @@ Ayrıca aşağıdaki paketler de kullanılmıştır.
 * ggpubr
 * skimr
 
-İlk olarak, `head()` fonksiyonu ile bu veri setindeki  ilk 6 gözlemi tablo formatında yazdıralım. Tablo oluşturmak için `knitr` paketi içindeki `kable()` fonksiyonununu kullanabiliriz. Bu tabloya `caption` seçeneği ile bir açıklama yazısıda ekleyebiliriz. 
+İlk olarak, `head()` fonksiyonu ile `mpg` veri setindeki  ilk 6 gözlemi tablo formatında yazdıralım. Tablo oluşturmak için `knitr` paketi içindeki `kable()` fonksiyonununu kullanabiliriz. Bu tabloya `caption` seçeneği ile bir açıklama yazısıda ekleyebiliriz. 
 
 ```{r, mpgdata, warning=FALSE}
 head(mpg)%>% 
@@ -62,7 +62,7 @@ Tablodaki değişkenlerin açıklamaları aşağıdaki gibidir.
 
 ## Verilerin Temizlenmesi
 
-İstatisitksel analizler için toplanan veriler çoğu zaman doğrudan kullanıma hazır değildir. Verilerin toplanması veya bilgisayara aktarılması sırasında yazım hataları, eksik gözlemler, analizlerde gerekli olmayan gözlemler toplanmış olabilir. Diğer teraftan, analizler için gerekli ancak veriler toplanırken dikkate alınmayan değişkenlerinde veri setine eklenmesi gerekli olabilir. Ayrıca, veriler okunurken  R tarafından otomatik olarak belirlenen değişken tipleri yanlış veya uygun olmayabilir. Bu nedenle analizlere başlamadan önce veri içindeki hataların düzeltilmesi, eksik gözlemlerin silinmesi, fazla değişkenlerin silinmesi, yeni değişkenlerin eklenmesi, değişken tiplerinin uygun hale getirilmesi gibi işlemlerin yapılması gerekmektedir. Bu işlemler veri temizleme olarak isimlendirilir.  
+İstatisitksel analizler için toplanan veriler çoğu zaman doğrudan kullanıma hazır değildir. Verilerin toplanması veya bilgisayara aktarılması sırasında yazım hataları, eksik gözlemler, analizlerde gerekli olmayan gözlemler toplanmış olabilir. Diğer taraftan, analizler için gerekli ancak veriler toplanırken dikkate alınmayan değişkenlerinde veri setine eklenmesi gerekli olabilir. Ayrıca, veriler okunurken  R tarafından otomatik olarak belirlenen değişken tipleri yanlış veya uygun olmayabilir. Bu nedenle analizlere başlamadan önce veri içindeki hataların düzeltilmesi, eksik gözlemlerin silinmesi, fazla değişkenlerin silinmesi, yeni değişkenlerin eklenmesi, değişken tiplerinin uygun hale getirilmesi gibi işlemlerin yapılması gerekmektedir. Bu işlemler veri temizleme olarak isimlendirilir.  
 
 
 ### Değişken Tiplerinin Değiştirilmesi
@@ -73,9 +73,9 @@ Veri setindeki değişken tiplerinin istatistiksel analizler veya grafikler içi
 str(mpg)
 ```
 
-Yukarıdaki listede mpg veri setinde yer alan değişkenlerin isimleri, tipleri, gözlem sayıları ve değişkenlere ait bir kaç gözlem verilmektedir. 
+Yukarıdaki listede `mpg` veri setinde yer alan değişkenlerin isimleri, tipleri, gözlem sayıları ve değişkenlere ait bir kaç gözlem değeri örnek olarak verilmektedir. 
 
-R, sözel ifadeleri içeren gözlemlerden oluşan değişkenleri `chr`, tamsayı gözlemlerden oluşan değişkenleri `int` ve ondalıklı gözlemlerden oluşan değişkenleri ise `num` olarak belirler. `chr` tipinde olan değişkenleri `Factor` tipine dönüştürmek grafiklerin çizilmesinde ve istatisitsel analizlerin yapılmasında kolaylık sağlamaktadır. Bu nedenle `chr` tipindeki değişkenleri `Factor` tipine dönüştürülmesi gerekir. `as.factor()` fonksiyonu ile bir değişkenin tipi `Factor` tipine dönüştürülebilir. Örneğin `trans` değişkenini faktör tipine dönüştürmek için aşağıdaki komutu kullanabiliriz.
+R programı sözel gözlemleri içeren değişkenleri `chr`, tamsayı gözlemleri içeren değişkenleri `int` ve ondalıklı gözlemleri içeren değişkenleri ise `num` olarak belirler. `chr` tipinde olan değişkenleri `Factor` tipine dönüştürmek grafiklerin çizilmesinde ve istatisitsel analizlerin yapılmasında kolaylık sağlamaktadır. Bu nedenle `chr` tipindeki değişkenleri `Factor` tipine dönüştürülmesi gerekir. `as.factor()` fonksiyonu ile bir değişkenin tipi `Factor` tipine dönüştürülebilir. Örneğin `trans` değişkenini faktör tipine dönüştürmek için aşağıdaki komutu kullanabiliriz.
 
 
 ```{r}
@@ -88,7 +88,7 @@ Karakter tipindeki değişkenlerin tümünü fakör tipine dönüştürmek için
 mpg <- mpg %>% mutate_if(is.character, as.factor)
 ```
 
-Veri setinde bazı değişkenler sayısal değer almasına rağmen bu değişkenler aslında kategorik nitelikte olabilir. Örneğin, mpg veri setinde `year` ve `cyl` değişkenleri araçları üretim yıllarına ve silindir sayılarına göre sınıflandırmak için kullanılan değişkenlerdir. Bu değişkenler üzerinden aritmatik işlemler yapılmayacağından faktör tipine dönüştürebiliriz.  
+Veri setinde bazı değişkenler sayısal değer almasına rağmen bu değişkenler aslında kategorik nitelikte olabilir. Örneğin, `mpg` veri setinde `year` ve `cyl` değişkenleri araçları üretim yıllarına ve silindir sayılarına göre sınıflandırmak için kullanılan değişkenlerdir. Bu değişkenler üzerinden aritmatik işlemler yapılmayacağından faktör tipine dönüştürebiliriz.  
 
 ```{r}
 mpg$year<-as.factor(mpg$year)
@@ -106,7 +106,7 @@ str(mpg)
 
 Gözlemlerin toplanması veya bilgisayara aktarılması sırasında veri setinde birtakım hatalar oluşabilir. Özellikle kategorik değişkenlerde yazım hataları ile sık sık karşılaşılmaktadır. Bu hataların tespit edilmesi ve doğru değerleri ile yerleştirilmesi gerekmektedir.
 
-Örneğin `mpg` veri setinde `trans` değişkeni altında vites tiplerinin daha detaylı bir şekilde girildiği görülmektedir. Bu detay bilgiler gerekli değil ise vites tiplerini genel olarak *otomatik* ve *manuel* olmak üzere iki grup altında toplayabiliriz. Bu değişkendeki gözlemler "auto" veya "manual" kelimelerini içermektedir. Bu nedenle ilk harfi "a" olan gözlemleri "auto" diğerlerini ise "manual" olarak değiştirebiliriz. Bu işlemi `ifelse()` ve `substring()`fonksiyonlarını kullanarak yapabiliriz. `ifelse()` fonksiyonu verilen bir koşul doğru ise bir ifadenin değilse diğer ifadenin yapılmasını sağlamaktadır. `substring()` fonksiyonu ise bir metin dizisi içinde ilk ve son değerler arasında yer alan karakter dizisini vermektedir.     
+Örneğin `mpg` veri setinde `trans` değişkeni altında vites tiplerinin daha detaylı bir şekilde girildiği görülmektedir. Bu detay bilgiler gerekli değil ise vites tiplerini genel olarak *auto* ve *manual* olmak üzere iki grup altında toplayabiliriz. Bu değişkende gözlemler "auto" veya "manual" kelimelerini içermektedir. Bu nedenle ilk harfi "a" olan gözlemleri "auto" diğerlerini ise "manual" olarak değiştirebiliriz. Bu işlemi `ifelse()` ve `substring()`fonksiyonlarını kullanarak yapabiliriz. `ifelse()` fonksiyonu verilen bir koşul doğru ise bir ifadenin değilse diğer ifadenin yapılmasını sağlamaktadır. `substring()` fonksiyonu ise bir metin dizisi içinde ilk ve son değerler arasında yer alan karakter dizisini vermektedir.     
 
 ```{r}
 mpg$trans <- ifelse(substring(mpg$trans, first=1, last=1)== "a", "auto", "manual") %>%as.factor()
@@ -114,7 +114,7 @@ mpg$trans <- ifelse(substring(mpg$trans, first=1, last=1)== "a", "auto", "manual
 
 ### Değişkenlerin Silinmesi ve Yeni Değişken Eklenmesi
 
-Bazı veri setlerinde analizlerde kullanılmayacak değişkenler bulunabilir. Bu değişkenleri silinmesi isteniyor ise bunun için farklı yöntemler kullanılabilir. Birinci olarak, silinecek değişkenlere `NULL` ataması yapılabilir.   
+Bazı veri setlerinde analizlerde kullanılmayacak değişkenler bulunabilir. Bu değişkenleri silinmesi için farklı yöntemler kullanılabilir. Birinci olarak, silinecek değişkenlere `NULL` ataması yapılabilir.   
 
 ```{r eval=FALSE}
 # manufacturer değişkenini silmek için
