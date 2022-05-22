@@ -171,6 +171,7 @@ Veri setlerinde bazı gözlemlere ait bilgi olmadığı veya unutulduğu için b
 mean(mpg$cyl, na.rm = TRUE)
 ```
 
+
 Eksik gözlemleri silmek yerine diğer bir seçenek eksik gözlemleri tahmin etmektir. Özellikle küçük veri setlerinde bu yöntem tercih edilmelidir. Sayısal değişkenlerdeki eksik gözlemleri tahmin etmek için aritmetik ortalama veya medyan, kategorik değişkenlerde ise mod (en sık tekrar eden değer) gibi basit istatistikler kullanılabilir. Bu basit istatistikler yerine daha karmaşık tahmin yöntemleri de kullanılabilir. 
 
 Veri setinde gözlem olup olmadığını kontrol etmek için  `is.na()` fonksiyonu kullanabiliriz. Bu fonksiyon eksik gözlemler için `TRUE` diğer durumda `FALSE` sonucunu vermektedir.
@@ -298,7 +299,9 @@ H_1: \mu_{1999} \ne \mu_{2008}$$
 
 Burada $\mu_{1999}$ ve $\mu_{2008}$ yıllara göre araçların bir galon yakıt ile gittikleri ortalama mesafeleri temsil etmektedir. 
 
-Bu hipotezi test etmek için t-testini kullanabiliriz. Ancak t-testini kullanabilmek için verilerin normal dağılıma sahip olması gerekir. Bu nedenle önce verilerin normal dağılıma sahip olup olmadığı belirlenmelidir. Bunun için ilk  önce görsel olarak verilerin normal dağılıma sahip olup olmadığını belirleyebiliriz. Eğer bu grafik çan eğrisine benziyor ise veriler normal dağılıma sahip olduğunu söyleyebiliriz. Her iki yıla ait ortalama mesafelerin yoğunluk grafiğini çizelim. 
+### t Testi
+
+Bir veya iki anakütle ortalama veya oranları ilgili iddiaları test test etmek için t-testini kullanabiliriz. Ancak t-testini kullanabilmek için verilerin normal dağılıma sahip olması gerekir. Bu nedenle önce verilerin normal dağılıma sahip olup olmadığı belirlenmelidir. Bunun için  grafik yöntemler veya   istatistiksel testler kullanılabilir. Grafik olarak gözlemlerin olasılık yoğunluk fonksiyonu veya histogram grafiği   normal dağılıma yakın bir grafik ise verilerin normal dağılıma sahip olduğunu söyleyebiliriz. Örneğin araçların üretim yıllarına  ait ortalama mesafelerin olasılık yoğunluk grafiğini çizelim. 
 
 ```{r warning=FALSE}
 ggplot(mpg, aes(x = mean_mpg)) +
@@ -306,22 +309,38 @@ ggplot(mpg, aes(x = mean_mpg)) +
   facet_grid(year ~ .)
 ```
 
-Bu grafiklerden verilerin kısmen normal dağılıma  yaklaştığı görülmektedir. 
+Bu grafiklerden verilerin kısmen normal dağılıma  sahip olduğu görülmektedir. 
 
-İkinci olarak Q-Q grafiği ile verilerin normal dağılıma sahip olduğunu belirleyebiliriz. Q-Q grafiğinde gözlemler bir doğru üzerinde yer alıyor ise verilerin normal dağılıma sahip olduğu sonucuna varılır.  Q-Q grafiğini çizmek için ggpubr paketinde `ggqqplot()` fonksiyonunu kullanabiliriz.  
+İkinci grafik yöntem olarak Q-Q grafiğini (quantile-quantile plot) kullanabiliriz. Q-Q grafiğinde tüm noktalar bir doğru üzerinde yer alıyor ise verilerin normal dağılıma sahip olduğu sonucuna varılır. QQ grafiğini çizmek için `ggplot2` paketi içindeki `stat_qq()` ve `stat_qq_line()` fonksiyonları birlikte kullanılabilir.
 
 ```{r}
-ggqqplot(mpg, "mean_mpg", facet.by="year")
+ggplot(data=mpg, aes(sample=mean_mpg))+
+ stat_qq(distribution = qnorm)+
+  stat_qq_line(distribution = qnorm)+
+  facet_grid(.~year)
 ```
 
-Shapiro-Wilk testi 
+Bu grafikte noktaların büyük bir bölümü çizgi üzerinde bulunduğu için yıllar bazında ortalama yakıt tüketimlerinin yaklaşık normal dağılıma sahip olduğunu söyleyebiliriz.
+
+Q-Q grafiğini çizmek için alternatif olarak `ggpubr` paketinde `ggqqplot()` fonksiyonu da  kullanılabilir.  
+
+```{r}
+ggqqplot(mpg, "mean_mpg", facet.by="year",)
+```
+
+Grafiklerde gölgeli bölgeler normallik varsayımının sağlandığı bölgeleri yani güven aralığını göstermektedir. 1999 yılında araçlara ait verilerin bir kısmı güven aralığının dışında olduğundan normal dağılıma sahip değildir. 
+
+**Shapiro-Wilk testi**
+
+Verilerin normal dağılıma sahip olup olmadığını belirlemek için kullanılan bir testtir. 
+
 $$
 \begin{align}
 &H_0: \text{Veriler normal dağılıma sahiptir}\\
 &H_1: \text{Veriler normal dağılıma sahip değildir}
 \end{align}
 $$
-dlookr paketi 
+Bu hipotezi `dlookr` paketi içindeki `normality()` fonksiyonunu kullanarak test edebiliriz.  
 
 ```{r}
 mpg %>%
@@ -329,9 +348,14 @@ mpg %>%
   normality(mean_mpg)%>%flextable()
 ```
 
+Bu test sonucunda $p_{değeri}<0.05$ ise $H_0$ hipotezi reddedilir. Yukarıdaki tabloda 1999 yılındaki araçların ortalama yakıt tüketimlerinin normal dağılıma sahip olmadığı $(0.0000047<0.05)$ ve 2008 yılındaki araçların ortalama yakıt tüketimlerinin ise normal dağılıma sahiptir hipotezi reddedilemiştir $(0.0505>0.05)$ 
+
+Grafikler ve Shapiro-Wilk testi sonuçlarından 1999 yılına ait verilerin normal dağılıma sahip olmadığını söyleyebiliriz.
+
+Eğer veriler normal dağılıma sahip değil ise uygun bir dönüşüm ile verilerin normal dağılıma sahip olması sağlanabilir. Normal dağılam dönüştürmek için gözlemlerin logoritması, karekökü gibi işlemler yapılabilir. Eğer bu dönüşüm sonunda veriler normal dağılıma sahip olmuyor ise parametrik olmayan testler tercih edilmelidir.
 
 
-`t.test()` fonksiyonunu kullanarak test edebiliriz. Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
+Ortalama yakıt tüketimine ait veriler normal varsayımını çok fazla çiğnememektedir. Bu nedenle t-testini kullanabiliriz. `t.test()` fonksiyonunu kullanarak test edebiliriz. Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
 
 
 ```{r}
@@ -369,7 +393,7 @@ ggplot(mpg)+
 ```
 
 
-Otomatik vitesli araçların düz vitesli araçlara göre ortalama mesafelerin daha kısa olduğu iddiasını doğru olup olmadığını t testi ile belirleyelim. Bunun için hipotezleri aşağıdaki gibi oluşturabiliriz.
+Otomatik vitesli araçların düz vitesli araçlara göre ortalama mesafelerin daha kısa olduğu iddiasını doğru olup olmadığını verilerin normal dağılıma sahip olduğunu varsayarak t testi ile belirleyelim. Bunun için hipotezleri aşağıdaki gibi oluşturabiliriz.
 
 $$H_0: \mu_{auto}=\mu_{manual}\\
 H_1: \mu_{auto}<\mu_{manual}$$
@@ -378,3 +402,31 @@ test2=t.test(data=mpg, mean_mpg~trans, var.equal=TRUE)
 test2
 ```
 Yukarıdaki sonuçlarda $p_{değeri}=`r format(test2$p.value,digit=4)`<0.05$ olduğundan $H_0$ hipotezi reddedilir. Otomatik vitesli araçlar bir galon benzinle ortalama olarak daha kısa mesafe kattemektedirler.
+
+### Ki-kare testi
+
+Vites sayısı ile vites tipi arasında bir ilişki olup olmadığını belirleyelim
+```{r}
+ggplot(mpg,aes(x=cyl, fill=trans))+
+  geom_bar(position = "fill")+
+  stat_count(geom = "text", 
+             aes(label = paste( "%", round((..count..)/sum(..count..)*100))),
+             position=position_fill(vjust=0.5), colour="white",size=8)
+```
+
+Grafikten vites sayısı arttıkça araçların daha çok otomatik vitesli olduğu görülmektedir. Bu nedenle aşağıdaki hipotezi test edelim
+
+$$
+\begin{align}
+&H_0: \text{Silindir sayısı ve vites tipi arasında ilişki yoktur}\\
+&H_1: \text{Silindir sayısı ve vites tipi arasında ilişki vardır}
+\end{align}
+$$
+Bu hipotezi test etmek için önce çapraz tabloyu oluşturalım
+```{r}
+tablo <- as.matrix(table(mpg$cyl, mpg$trans))
+tablo
+chisq.test(tablo,correct = TRUE)
+```
+
+$p_{değeri}<0.05$ olduğundan $H_0$ hipotezi reddedilir. Vites sayısı ve vites tipi arasında ilişki vardır. 
