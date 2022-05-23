@@ -149,7 +149,7 @@ Değişken seçimini aynı zamanda `dplyr` paketindeki `select()` fonksiyonu kul
 mpg<-mpg %>% select(cyl, drv)
 ```
 
-Mevcut veri setinde yer almayan fakat analizler için gerekli değişkenlerin hesaplanması ve/veya başka bir veri setinden kopyalanması gerekebilir. Yeni bir değişken için yeni bir sütun  veri seti ismi ile yeni değişkenin ismi arasına \$ işareti konularak oluşturulabilir. Örneğin, `mpg` veri setine bir galon yakıt ile şehir içi ve şehir dışında gidilecek ortalama mesafeyi hesaplamak bu değerleri `mean_mpg` isminde yeni bir değişken  altında toplama  için `mpg$mean_mpg` komutu ile veri setine yeni bir sütun eklenebilir. Ortalama mesafe  hesaplanırken şehir içi yakıt tüketiminin %70'i ve şehir dışı yakıt tüketimin %30'u alınmaktadır.  
+Mevcut veri setinde yer almayan fakat analizler için gerekli değişkenlerin hesaplanması ve/veya başka bir veri setinden kopyalanması gerekebilir. Yeni bir değişken için yeni bir sütun  veri seti ismi ile yeni değişkenin ismi arasına \$ işareti konularak oluşturulabilir. Örneğin, `mpg` veri setine bir galon yakıt ile şehir içi ve şehir dışında gidilecek ortalama mesafe için `mean_mpg` isminde yeni bir değişken  oluşturmak için `mpg$mean_mpg` komutu ile veri setine yeni bir sütun eklenebilir. Ortalama mesafe  hesaplanırken şehir içi yakıt tüketiminin %70'i ve şehir dışı yakıt tüketimin %30'u alınmaktadır.  
 
 ```{r warning=FALSE}
 mpg$mean_mpg <- 0.7*mpg$cty + 0.3*mpg$hwy
