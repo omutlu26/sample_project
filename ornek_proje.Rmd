@@ -301,7 +301,7 @@ Burada $\mu_{1999}$ ve $\mu_{2008}$ yıllara göre araçların bir galon yakıt 
 
 ### t Testi
 
-Bir veya iki anakütle ortalama veya oranları ilgili iddiaları test test etmek için t-testini kullanabiliriz. Ancak t-testini kullanabilmek için verilerin normal dağılıma sahip olması gerekir. Bu nedenle önce verilerin normal dağılıma sahip olup olmadığı belirlenmelidir. Bunun için  grafik yöntemler veya   istatistiksel testler kullanılabilir. Grafik olarak gözlemlerin olasılık yoğunluk fonksiyonu veya histogram grafiği   normal dağılıma yakın bir grafik ise verilerin normal dağılıma sahip olduğunu söyleyebiliriz. Örneğin araçların üretim yıllarına  ait ortalama mesafelerin olasılık yoğunluk grafiğini çizelim. 
+Bir veya iki anakütle ortalama veya oranları ilgili iddiaları test test etmek için t-testini kullanabiliriz. Ancak t-testini kullanabilmek için verilerin normal dağılıma sahip olması gerekir. Bu nedenle önce verilerin normal dağılıma sahip olup olmadığı belirlenmelidir. Verilerin normal dağılıma sahip olup olmadığını belirlemek için  grafik yöntemler veya   istatistiksel testler kullanılabilir. Grafik yöntemde ilk olarak gözlemlerin olasılık yoğunluk fonksiyonu veya histogram grafiğine bakılabilir. Eğer bu grafikler normal dağılıma yakın ise verilerin normal dağılıma sahip olduğunu söyleyebiliriz. Örneğin araçların üretim yıllarına  göre bir galon benzin ile gittikleri ortalama mesafelerin olasılık yoğunluk grafiğini çizelim. 
 
 ```{r warning=FALSE}
 ggplot(mpg, aes(x = mean_mpg)) +
@@ -311,7 +311,7 @@ ggplot(mpg, aes(x = mean_mpg)) +
 
 Bu grafiklerden verilerin kısmen normal dağılıma  sahip olduğu görülmektedir. 
 
-İkinci grafik yöntem olarak Q-Q grafiğini (quantile-quantile plot) kullanabiliriz. Q-Q grafiğinde tüm noktalar bir doğru üzerinde yer alıyor ise verilerin normal dağılıma sahip olduğu sonucuna varılır. QQ grafiğini çizmek için `ggplot2` paketi içindeki `stat_qq()` ve `stat_qq_line()` fonksiyonları birlikte kullanılabilir.
+İkinci yöntem olarak Q-Q grafiğini (quantile-quantile plot) kullanabiliriz. Q-Q grafiğinde tüm noktalar bir doğru üzerinde yer alıyor ise verilerin normal dağılıma sahip olduğu sonucuna varılır. Q-Q grafiğini çizmek için `ggplot2` paketi içindeki `stat_qq()` ve `stat_qq_line()` fonksiyonları birlikte kullanılır.
 
 ```{r}
 ggplot(data=mpg, aes(sample=mean_mpg))+
@@ -320,19 +320,19 @@ ggplot(data=mpg, aes(sample=mean_mpg))+
   facet_grid(.~year)
 ```
 
-Bu grafikte noktaların büyük bir bölümü çizgi üzerinde bulunduğu için yıllar bazında ortalama yakıt tüketimlerinin yaklaşık normal dağılıma sahip olduğunu söyleyebiliriz.
+Birinci grafikte noktaların bir kısmı çizgi üzerinde bulunmadığı için verilerin normal dağılıma sahip olmadığını ikinci grafikte ise kısmen normal dağılıma sahip olduğunu söylwywbiliriz.
 
-Q-Q grafiğini çizmek için alternatif olarak `ggpubr` paketinde `ggqqplot()` fonksiyonu da  kullanılabilir.  
+Q-Q grafiğini çizmek için alternatif olarak `ggpubr` paketinde `ggqqplot()` fonksiyonu da  kullanılabilir. Bu grafikteki gölgeli kısım güven aralığı olarak isimlendirilir. Eğer tüm noktalar güven aralığı içinde ise normallik varsayımı sağlanır. 
 
 ```{r}
 ggqqplot(mpg, "mean_mpg", facet.by="year",)
 ```
 
-Grafiklerde gölgeli bölgeler normallik varsayımının sağlandığı bölgeleri yani güven aralığını göstermektedir. 1999 yılında araçlara ait verilerin bir kısmı güven aralığının dışında olduğundan normal dağılıma sahip değildir. 
+1999 yılında araçlara ait verilerin bir kısmı güven aralığının dışında olduğundan normal dağılıma sahip değildir. 
 
 **Shapiro-Wilk testi**
 
-Verilerin normal dağılıma sahip olup olmadığını belirlemek için kullanılan bir testtir. 
+Grafik yöntemler ile bulunan sonuçlar verilerin normal dağılıma sahip olup olmadığını belirlemek için yeterli değildir. İstatistiksel testler ile sonuçların doğruluğu tespit edilmelidir. Shapiro-Wilk testi verilerin normal dağılıma sahip olmadığını belirlemek için kullanılan parametrik testlerden birisidir. 
 
 $$
 \begin{align}
