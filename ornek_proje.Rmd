@@ -156,7 +156,7 @@ mpg$mean_mpg <- 0.7*mpg$cty + 0.3*mpg$hwy
 head(mpg, 6)%>%flextable()
 ```
 
-Bu işlemi `dplyr` paketi içindeki `mutate()` fonksiyonunu kullanarak aşağıdaki gibi yapabiliriz. 
+Bu işlemi alternatif olarak `dplyr` paketi içindeki `mutate()` fonksiyonunu kullanarak aşağıdaki gibi yapabiliriz. 
 
 ```{r eval=FALSE,warning=FALSE}
 mpg <- mpg%>%mutate(mean_mpg=0.7*cty+0.3*hwy)
@@ -203,7 +203,7 @@ Bir veri setinde yer alan eksik gözlemlerin tümünü silmek için `na.omit()` 
 mpg<-mpg%>%na.omit()
 ```
 
-Bir veya daha fazla sütunda bulunan eksik verileri silmek için ``dplyr`` paketi içindeki yer alan  `drop_na()` fonksiyonu kullanılabilir. Örneğin `cyl` ve `hwy` değişkenleri içindeki eksik gözlemleri silmek için aşağıdaki komutu kullanabiliriz.  
+Bir veya daha fazla sütunda bulunan eksik verileri silmek için `dplyr` paketi içindeki yer alan  `drop_na()` fonksiyonu kullanılabilir. Örneğin `cyl` ve `hwy` değişkenleri içindeki eksik gözlemleri silmek için aşağıdaki komutu kullanabiliriz.  
 
 ```{r eval=FALSE}
 mpg%>%drop_na(cyl,hwy)
@@ -263,7 +263,7 @@ mpg%>%summarise_if(is.numeric,list(ort=mean, medyan=median))%>%
 
 Bir veya daha fazla anakütle hakkında ortaya atılan iddiaların doğruluğunu araştırmak için yapılan testlere hipotez testleri denir.
 
-Yıllar itibariyle araçların yakıt tüketimlerinde bir değişim olup olmadığını araştırmak istediğimizi varsayalım. İlk olarak bir değişim olup olmadığını grafik olarak görebiliriz. Bunun için kutu grafiğini kullanabiliriz.
+Yıllar itibariyle araçların yakıt tüketimlerinde bir değişim olup olmadığını hipotez testi ile araştırmak istediğimizi varsayalım. Bunun için önce bir iddanın oluşturulması gerekir. Bu iddiayı oluşturmak için ilk olarak araçların yakıt tüketiminde bir değişim olup olmadığını grafik olarak inceleyelim. Bunun için kutu grafiğini kullanabiliriz.
 
 ```{r}
 mpg%>%group_by(year)%>%ggplot()+
@@ -276,7 +276,7 @@ mpg%>%group_by(year)%>%ggplot()+
     )
 ```
 
-Yukarıdaki grafikten araçların yakıt tüketimlerinde çok fazla bir değişim olmadığı görülmektedir. 1999 yılında bazı araçların (nokta ile gösterilen değerler) bir galon yakıt ile çok daha fazla mesafe gittiği görülmektedir.
+Yukarıdaki grafikte kutular birbirine hizalı ve medyan değerleri birbirine yakın olduğu için araçların yakıt tüketimlerinde çok fazla bir değişim olmadığı görülmektedir. Ancak, 1999 yılında bazı araçların (nokta ile gösterilen değerler) bir galon yakıt ile çok daha fazla mesafe gittiği görülmektedir.
 
 1999 ve 2008 yıllarında üretilen araçların yakıt tüketimlerini karşılaştırmak için her iki yılda üretilen araçların ortalama yakıt tüketimlerini hesaplayalım. Bunun için önce `group_by()` fonksiyonu ile yıl bazında gözlemleri gruplandırıp daha sonra `summarise()` fonksiyonu ile yıl bazında ortalamaları hesaplayabiliriz.
 
