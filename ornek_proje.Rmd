@@ -355,11 +355,21 @@ Grafikler ve Shapiro-Wilk testi sonuçlarından 1999 yılına ait verilerin norm
 Eğer veriler normal dağılıma sahip değil ise uygun bir dönüşüm ile verilerin normal dağılıma sahip olması sağlanabilir. Dönüşüm için gözlemlerin logoritması veya karekökü vb. alınabilir. Eğer yapılan dönüşümler sonunda veriler normal dağılıma sahip olmuyor ise parametrik olmayan testler tercih edilmelidir.
 
 
-Ortalama yakıt tüketimine ait veriler normal varsayımını çok fazla çiğnememektedir. Bu nedenle t-testini kullanabiliriz. `t.test()` fonksiyonunu kullanarak test edebiliriz. Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
+Ortalama yakıt tüketimine ait veriler normal varsayımını sağlamamakla birlikte t-testinin uygulamasını göstermek adına teste devam edelim. 
+
+$$
+\begin{align}
+&H_0: \mu_{1999} = \mu_{2008}\\
+&H_1: \mu_{1999} \ne \mu_{2008}
+\end{align}
+$$
+Burada $\mu_{1999}$ ve $\mu_{2008}$ sırasıyla bir galon benzin ile gidilen ortalama mesafeleri temsil etmektedir. 
+R programında t-testini yapmak için `t.test()` fonksiyonunu kullanılır.  
+Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
 
 
 ```{r}
-test=t.test(data=mpg, mean_mpg~year, var.equal=TRUE)
+test=t.test(data=mpg, mean_mpg~year, alternative="two.sided", var.equal=TRUE)
 test
 ```
 
