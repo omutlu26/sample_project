@@ -322,7 +322,7 @@ ggplot(data=mpg, aes(sample=mean_mpg))+
 
 Birinci grafikte noktaların bir kısmı çizgi üzerinde bulunmadığı için verilerin normal dağılıma sahip olmadığını ikinci grafikte ise kısmen normal dağılıma sahip olduğunu söylwywbiliriz.
 
-Q-Q grafiğini çizmek için alternatif olarak `ggpubr` paketinde `ggqqplot()` fonksiyonu da  kullanılabilir. Bu grafikteki gölgeli kısım güven aralığı olarak isimlendirilir. Eğer tüm noktalar güven aralığı içinde ise normallik varsayımı sağlanır. 
+Q-Q grafiğini çizmek için alternatif olarak `ggpubr` paketinde `ggqqplot()` fonksiyonu da  kullanılabilir. Bu grafikteki gölgeli kısım güven aralığı olarak isimlendirilir. Eğer tüm noktalar güven aralığı içinde ise normallik varsayımı sağlanmaktadır. 
 
 ```{r}
 ggqqplot(mpg, "mean_mpg", facet.by="year",)
@@ -340,7 +340,7 @@ $$
 &H_1: \text{Veriler normal dağılıma sahip değildir}
 \end{align}
 $$
-Bu hipotezi `dlookr` paketi içindeki `normality()` fonksiyonunu kullanarak test edebiliriz.  
+Shapiro-Wilk testini `dlookr` paketi içindeki `normality()` fonksiyonunu kullanarak gerçekleştirebiliriz.  
 
 ```{r}
 mpg %>%
@@ -348,11 +348,11 @@ mpg %>%
   normality(mean_mpg)%>%flextable()
 ```
 
-Bu test sonucunda $p_{değeri}<0.05$ ise $H_0$ hipotezi reddedilir. Yukarıdaki tabloda 1999 yılındaki araçların ortalama yakıt tüketimlerinin normal dağılıma sahip olmadığı $(0.0000047<0.05)$ ve 2008 yılındaki araçların ortalama yakıt tüketimlerinin ise normal dağılıma sahiptir hipotezi reddedilemiştir $(0.0505>0.05)$ 
+Yukarıdaki tabloda $p_{değeri}<0.05$ ise $H_0$ hipotezi reddedilir. 1999 yılındaki araçların ortalama yakıt tüketimlerinin normal dağılıma sahip olmadığı $(0.0000047<0.05)$ ve 2008 yılındaki araçların ortalama yakıt tüketimlerinin ise normal dağılıma sahiptir hipotezi reddedilemiştir $(0.0505>0.05)$ 
 
 Grafikler ve Shapiro-Wilk testi sonuçlarından 1999 yılına ait verilerin normal dağılıma sahip olmadığını söyleyebiliriz.
 
-Eğer veriler normal dağılıma sahip değil ise uygun bir dönüşüm ile verilerin normal dağılıma sahip olması sağlanabilir. Normal dağılam dönüştürmek için gözlemlerin logoritması, karekökü gibi işlemler yapılabilir. Eğer bu dönüşüm sonunda veriler normal dağılıma sahip olmuyor ise parametrik olmayan testler tercih edilmelidir.
+Eğer veriler normal dağılıma sahip değil ise uygun bir dönüşüm ile verilerin normal dağılıma sahip olması sağlanabilir. Dönüşüm için gözlemlerin logoritması veya karekökü vb. alınabilir. Eğer yapılan dönüşümler sonunda veriler normal dağılıma sahip olmuyor ise parametrik olmayan testler tercih edilmelidir.
 
 
 Ortalama yakıt tüketimine ait veriler normal varsayımını çok fazla çiğnememektedir. Bu nedenle t-testini kullanabiliriz. `t.test()` fonksiyonunu kullanarak test edebiliriz. Bir galon benzin ile gidilen ortalama mesafeler (`mean_mpg`) test edilen değişken olmak üzere `~year` ifadesi ile bu değişken yıl bazında gruplara ayıralım. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
