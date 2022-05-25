@@ -310,7 +310,7 @@ H_1: \mu_{1999} \ne \mu_{2008}$$
 
 Burada $\mu_{1999}$ ve $\mu_{2008}$ yıllara göre araçların bir galon yakıt ile gittikleri ortalama mesafeleri temsil etmektedir. Bu iddianın doğruluğunu  t-testi ile araştırabiliriz. 
 
-### t Testi
+### t-Testi
 
 Bir veya iki anakütle ortalamaları veya oranları ilgili iddiaları araştırmak için t-testini kullanılabilir. t-testini kullanabilmek için verilerin normal dağılıma sahip olması gerekir. Bu nedenle önce verilerin normal dağılıma sahip olup olmadığı belirlenmelidir. Verilerin normal dağılıma sahip olup olmadığını grafik yöntemler veya   istatistiksel testler ile belirlenmektedir. Grafik yöntemde gözlemlerin olasılık yoğunluk fonksiyonu veya histogram grafiğine bakılabilir. Eğer bu grafikler normal dağılıma yakın ise verilerin normal dağılıma sahip olduğunu söyleyebiliriz. Örneğin araçların üretim yıllarına  göre bir galon benzin ile gittikleri ortalama mesafelerin olasılık yoğunluk grafiğini çizelim. 
 
@@ -341,7 +341,7 @@ ggqqplot(mpg, "mean_mpg", facet.by="year",)
 
 Yukarıdaki grafikte 1999 yılında araçlara ait gözlemlerin bir kısmı güven aralığının dışında olduğundan normallik varsayımının sağlanmadığını söyleyebiliriz. 
 
-**Shapiro-Wilk testi**
+**Shapiro-Wilk Testi**
 
 Grafik yöntemler ile bulunan sonuçlar verilerin normal dağılıma sahip olup olmadığını belirlemek için yeterli değildir. Nihai karar ancak istatistiksel testler ile verilebilir. Normallik testi için parametrik veya parametrik olmayan testler kullanılabilir. Shapiro-Wilk testi normallik için kullanılan parametrik testlerden birisidir. Normallik için aşağıdaki hipotezler test edilir.
 
@@ -367,7 +367,7 @@ Eğer veriler normal dağılıma sahip değil ise uygun bir dönüşüm ile veri
 
 Ortalama yakıt tüketimine ait veriler normal varsayımını sağlamamakla birlikte t-testinin uygulamasını göstermek adına hipotez testine devam edelim. 
 
-R programında t-testini yapmak için `t.test()` fonksiyonunu kullanılır. Bir galon benzin ile gidilen ortalama mesafeyi (`mean_mpg`) yıl bazında (`year`) gruplandırmak için `mean_mpg~year` komutu kullanılır. t testi ile iki grup arasında karşılaştırma yapılabileceğinden gruplama değişkeninde iki farklı seviye olmalıdır. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu şart sağlanmaktadır. 
+R programında t-testini yapmak için `t.test()` fonksiyonunu kullanılır. t-testi bir veri setinde iki farklı grubu karşılaştırmak için yapmak için **test değişkeni** ve **gruplama değişkeni** olmak üzere iki değişken belirlenmelidir.  Gruplama için kullanılacak değişkende en fazla iki farklı seviye olmalıdır. Test ve gruplama değişkenlerini belirtmek için R programında  `test_değişkeni~gruplama_değişkeni` şeklinde bir formül oluşturulur. Bir galon benzin ile gidilen ortalama mesafe (`mean_mpg`) test değişkeni ve  yıllar (`year`) gruplama değişkeni olmak üzere `mean_mpg~year` formülü ile yıl bazında araçlar gruplandırılırak ortalama mesafeleri test edilir. `year` değişkeninde 1999 ve 2008 model araçlar olduğundan bu iki yıldaki sağlanmaktadır. Hipotez testinde alternatif hipotez $(\ne)$ olduğunda `alternative="two.sided"`şeklinde belirtilmiştir. t-testi yaparken dikkat edilmesi gereken bir diğer husus iki grubun varyansların eşit olup olmadığıdır. Varyansların eşit olup olmamasına göre farklı istatistikler kullanıldığından bu durumun öncenden tespit edilmesi gerekir. Eğer varyansların istatistiksel olarak eşit olduğu biliniyor ise `var.equal=TRUE`şeklinde belirtilmelidir. Bu örnek için varyansların eşit olduğunu varsayalım. 
 
 
 ```{r}
@@ -375,6 +375,11 @@ test=t.test(data=mpg, mean_mpg~year, alternative="two.sided", var.equal=TRUE)
 test
 ```
 
+Yukarıdaki sonuçlarda $p_{değeri}=`r format(test$p.value,digit=4)`>0.05$ olduğundan $H_0$ hipotezi reddedilemez. Eğer varyansların eşit olmadığını varsayar isek
+```{r}
+test=t.test(data=mpg, mean_mpg~year, alternative="two.sided", var.equal=FALSE)
+test
+```
 Yukarıdaki sonuçlarda $p_{değeri}=`r format(test$p.value,digit=4)`>0.05$ olduğundan $H_0$ hipotezi reddedilemez. Yıllara göre araçlaların ortalama mesafelerinde bir değişim olmamıştır.
 
 İkinci olarak, otomatik vitesli araçların düz vitesli araçlara göre daha fazla yakıt tükkettiği şeklinde bir görüş vardır. Bu görüşün doğruluğunu araştırmak için otomatik ve düz vitesli araçların ortalama yakıt tüketimlerini hesaplayalım.
@@ -426,7 +431,7 @@ ggplot(mpg,aes(x=cyl, fill=trans))+
              position=position_fill(vjust=0.5), colour="white",size=8)
 ```
 
-Grafikten vites sayısı arttıkça araçların daha çok otomatik vitesli olduğu görülmektedir. Bu nedenle aşağıdaki hipotezi test edelim
+Grafikten vites sayısı arttıkça araçların daha çok otomatik vitesli olduğu görülmektedir. Yani, vites sayısı ve vites tipi arasında bir ilişki varmış gibi görünmektedir. Bu ilişkinin doğruluğunu araştırmak için aşağıdaki hipotezleri test edebiliriz. 
 
 $$
 \begin{align}
@@ -434,10 +439,16 @@ $$
 &H_1: \text{Silindir sayısı ve vites tipi arasında ilişki vardır}
 \end{align}
 $$
-Bu hipotezi test etmek için önce çapraz tabloyu oluşturalım
+Bu hipotezi test etmek için vites sayısı ve tipine göre araçların sayılarını tespit etmemiz gerekir. Aşağıdaki tabloda bu sayılar verilmektedir. Bu tablo **çapraz tablo** olarak isimlendirilir. R programında çapraz tablo oluşturmak için `table()` fonksiyonu kullanılır. Çapraz tablolar bir veya daha fazla değişken için kullanılabilir. Ki-kare testleri için tabloların en falza iki boyutlu olması zorunludur. 
+
 ```{r}
-tablo <- as.matrix(table(mpg$cyl, mpg$trans))
+tablo <- table(mpg$cyl, mpg$trans)
 tablo
+```
+
+Ki-kare testini gerçekleştirmek için `chisq.test()` fonksiyonu kullanılır. 
+
+```{r}
 chisq.test(tablo,correct = TRUE)
 ```
 
